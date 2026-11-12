@@ -1,0 +1,38 @@
+# Remove the leading # to enable an item for this run.
+# Add # back to skip it. Multiple datasets and attacks can be enabled together.
+run:
+  profiles:
+    - cora-lcc
+    # - citeseer-lcc
+    # - polblogs-lcc
+    # - pubmed-lcc
+
+  attacks:
+    - random_add
+    - random_delete
+    - random_flip
+    # - dice_add
+    # - dice_delete
+    # - dice_mix
+    # - degree_add
+    # - degree_delete
+    # - prbcd
+    # - structack
+    # - gfattack
+    # - fgattack_untargeted
+    # - rnd
+    # - nettack_structure
+    # - nettack_feature
+    # - nettack_hybrid
+    # - fga
+    # - sgattack
+    # - pgdattack
+    # - metattack
+    # - igattack
+    # - bridge_add
+    # - hub_rewire
+
+  partitions:
+    - train
+    - val
+    - test

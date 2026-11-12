@@ -1,0 +1,176 @@
+project:
+  name: gnn-attack-detection-toolkit
+  version: universal-detector-v1
+
+seed: 42
+
+runtime:
+  device: auto
+  num_workers: 0
+  cpu_threads: 8
+
+paths:
+  raw_data: artifacts/raw
+  profiles: artifacts/profiles
+  attacks: artifacts/attacks
+  features: artifacts/features
+  models: artifacts/models
+  reports: artifacts/reports
+  logs: artifacts/logs
+
+active_profile: cora-lcc
+profiles:
+  cora-lcc:
+    name: Cora
+    source: deeprobust
+    setting: nettack
+    expected_num_nodes: 2485
+    clean_reference: artifacts/profiles/cora-lcc/clean.pt
+    probe_dir: artifacts/profiles/cora-lcc/probes
+  citeseer-lcc:
+    name: Citeseer
+    source: deeprobust
+    setting: nettack
+    expected_num_nodes: 2110
+    clean_reference: artifacts/profiles/citeseer-lcc/clean.pt
+    probe_dir: artifacts/profiles/citeseer-lcc/probes
+  polblogs-lcc:
+    name: Polblogs
+    source: deeprobust
+    setting: nettack
+    expected_num_nodes: 1222
+    clean_reference: artifacts/profiles/polblogs-lcc/clean.pt
+    probe_dir: artifacts/profiles/polblogs-lcc/probes
+  pubmed-lcc:
+    name: Pubmed
+    source: deeprobust
+    setting: nettack
+    expected_num_nodes: 19717
+    clean_reference: artifacts/profiles/pubmed-lcc/clean.pt
+    probe_dir: artifacts/profiles/pubmed-lcc/probes
+
+probes:
+  online:
+    - gcn
+    - gcn_jaccard
+    - simpgcn
+  offline_reference:
+    - prognn
+  training:
+    hidden_channels: 16
+    dropout: 0.5
+    epochs: 200
+    patience: 30
+    learning_rate: 0.01
+    weight_decay: 0.0005
+    jaccard_threshold: 0.01
+
+defenses:
+  models:
+    - gcn
+    - gcn_jaccard
+    - gcn_svd
+    - rgcn
+    - median_gcn
+    - simpgcn
+    - prognn
+    - gnnguard
+    - airgnn
+    - sgc
+
+attacks:
+  require_all_protocols: true
+  protocols:
+    - random_add
+    - random_delete
+    - random_flip
+    - dice_add
+    - dice_delete
+    - dice_mix
+    - degree_add
+    - degree_delete
+    - prbcd
+    - structack
+    - gfattack
+    - fgattack_untargeted
+    - rnd
+    - nettack_structure
+    - nettack_feature
+    - nettack_hybrid
+    - fga
+    - sgattack
+    - pgdattack
+    - metattack
+    - igattack
+    - bridge_add
+    - hub_rewire
+  structural_rates:
+    - 0.05
+    - 0.10
+    - 0.15
+    - 0.20
+  targeted_target_counts:
+    - 5
+    - 10
+    - 15
+    - 20
+  targeted_local_budget: 3
+  precomputed_metattack_dir: artifacts/raw/deeprobust/meta
+
+corpus:
+  sample_policy:
+    default:
+      train: 5
+      val: 2
+      test: 5
+    overrides: {}
+  seed_namespaces:
+    train: 100000000
+    val: 200000000
+    test: 300000000
+  max_generation_attempts: 100
+  minimum_target_degree: 5
+  output_dir: artifacts/attacks/corpus
+  sample_index_dir: artifacts/features/manifests
+
+detector:
+  # Identity/placeholder attributes are masked. This is a descriptor policy,
+  # never a dataset ID supplied to the learned model.
+  attribute_modes:
+    polblogs-lcc: none
+  nonattack_manifest: null
+  task: binary_classification
+  labels:
+    clean: 0
+    attacked: 1
+  model:
+    type: shared_gcn_reference_free
+    hidden_channels: 32
+    dropout: 0.20
+    epochs: 300
+    patience: 30
+    target_group_recall: 0.80
+    minimum_clean_specificity: 0.80
+    target_consecutive_epochs: 3
+    minimum_validation_group_size: 8
+    learning_rate: 0.005
+    weight_decay: 0.0001
+  model_path: artifacts/models/universal-attack-detector.pt
+  report_path: artifacts/reports/universal-detector-evaluation.json
+  prediction_path: artifacts/reports/graph-test-predictions.jsonl
+  demo_path: artifacts/reports/graph-detection-result.json
+
+evaluation:
+  minimum_attacks: 20
+  minimum_positive_per_attack: 4
+  minimum_accuracy: 0.80
+  minimum_clean_graphs: 2
+  primary_metrics:
+    - accuracy
+    - recall
+    - precision
+    - f1
+
+deployment:
+  portable_cpu_required: true
+  target_operating_system: windows

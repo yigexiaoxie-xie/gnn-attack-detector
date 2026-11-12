@@ -1,0 +1,39 @@
+.worktrees/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+.venv-*/
+.venv[0-9]*/
+.devtools/
+.playwright-cli/
+build/
+dist/
+*.egg-info/
+
+# Generated datasets, models, reports, and logs
+/artifacts/**
+!/artifacts/*/
+!/artifacts/*/.gitkeep
+/output/
+*.log
+
+# Local secrets and machine-specific files
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+server-private.txt
+.server_known_hosts
+/.streamlit/secrets.toml
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
