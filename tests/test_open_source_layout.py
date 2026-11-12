@@ -18,9 +18,10 @@ class OpenSourceLayoutTests(unittest.TestCase):
             "取消注释",
             "数据集数 × 攻击方法数",
             "自动复用",
-            "不能证明 80%",
+            "知识智能与安全计算研究组（吴涛团队）",
         ):
             self.assertIn(text, readme)
+        self.assertTrue(readme.rstrip().endswith("知识智能与安全计算研究组（吴涛团队）"))
 
     def test_third_party_notices_record_all_attack_provenance(self) -> None:
         notices = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
